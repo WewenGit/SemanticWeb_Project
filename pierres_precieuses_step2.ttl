@@ -1,0 +1,568 @@
+@prefix :     <http://example.org/gemmes#> .
+@prefix owl:  <http://www.w3.org/2002/07/owl#> .
+@prefix rdf:  <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd:  <http://www.w3.org/2001/XMLSchema#> .
+
+<http://example.org/gemmes> a owl:Ontology ;
+    owl:versionInfo "etape 2 - modelisation OWL"@fr ;
+    rdfs:label "Ontologie des pierres precieuses"@fr ;
+    rdfs:comment "Exemple pedagogique : mineraux, gemmes, composition chimique et origine geographique."@fr .
+
+###########################################################
+# TBOX - CLASSES GENERALES
+###########################################################
+
+:PierreNaturelle a owl:Class ;
+    rdfs:label "pierre naturelle"@fr .
+
+:Mineral a owl:Class ;
+    rdfs:subClassOf :PierreNaturelle ;
+    rdfs:label "mineral"@fr ;
+    rdfs:comment "Un specimen de mineral (et non l'espece minerale, qui est une sous-classe)."@fr .
+
+:Mineraloide a owl:Class ;
+    rdfs:subClassOf :PierreNaturelle ;
+    owl:disjointWith :Mineral ;
+    rdfs:label "mineraloide"@fr ;
+    rdfs:comment "Substance naturelle amorphe ou organique ne remplissant pas les criteres du mineral (opale, verre volcanique, ambre)."@fr .
+
+:MatiereOrganique a owl:Class ;
+    owl:disjointWith :Mineral , :Mineraloide , :Roche ;
+    rdfs:label "matiere organique"@fr ;
+    rdfs:comment "Matiere d'origine biologique entrant dans la composition de certaines roches (houille) ou gemmes (ambre, jais)."@fr .
+
+:Roche a owl:Class ;
+    rdfs:subClassOf :PierreNaturelle ;
+    owl:disjointWith :Mineral , :Mineraloide ;
+    rdfs:label "roche"@fr ;
+    rdfs:comment "Corps geologique naturel forme de mineraux, de mineraloides ou de matiere organique."@fr .
+
+:Gemme a owl:Class ;
+    rdfs:subClassOf :PierreNaturelle ;
+    rdfs:label "gemme"@fr ;
+    rdfs:comment "Pierre naturelle utilisee en joaillerie ou en ornementation."@fr .
+
+:PierrePrecieuse a owl:Class ;
+    rdfs:subClassOf :Gemme ;
+    rdfs:label "pierre precieuse"@fr ;
+    rdfs:comment "Diamant, rubis, saphir, emeraude : convention gemmologique, historique et commerciale."@fr .
+
+:PierreNonPrecieuse a owl:Class ;
+    rdfs:subClassOf :Gemme ;
+    owl:disjointWith :PierrePrecieuse ;
+    rdfs:label "pierre non precieuse"@fr .
+
+:PierreFine a owl:Class ;
+    rdfs:subClassOf :PierreNonPrecieuse ;
+    rdfs:label "pierre fine"@fr ;
+    rdfs:comment "Pierre ornementale (opale, amethyste) consideree non precieuse par categorisation gemmologique."@fr .
+
+:Fossile a owl:Class ;
+    rdfs:label "fossile"@fr .
+
+:Geode a owl:Class ;
+    rdfs:subClassOf :Roche ;
+    rdfs:label "geode"@fr .
+
+:MineralNatif a owl:Class ;
+    owl:equivalentClass [
+        a owl:Class ;
+        owl:intersectionOf (
+            :Mineral
+            [ a owl:Restriction ;
+              owl:onProperty :aPourElement ;
+              owl:qualifiedCardinality "1"^^xsd:nonNegativeInteger ;
+              owl:onClass :ElementChimique ]
+        )
+    ] ;
+    rdfs:label "mineral natif"@fr ;
+    rdfs:comment "Mineral constitue d'un seul element chimique (diamant, graphite)."@fr .
+
+:Pays a owl:Class ;
+    owl:hasKey ( :codeISO ) ;
+    rdfs:label "pays"@fr .
+
+# --- elements chimiques ---
+:ElementChimique a owl:Class ;
+    rdfs:label "element chimique"@fr ;
+    rdfs:comment "Element du tableau periodique entrant dans la composition d'un mineral."@fr .
+
+:Hydrogene a owl:Class ; rdfs:subClassOf :ElementChimique ; rdfs:label "hydrogene"@fr .
+:Fer       a owl:Class ; rdfs:subClassOf :ElementChimique ; rdfs:label "fer"@fr .
+:Chlore    a owl:Class ; rdfs:subClassOf :ElementChimique ; rdfs:label "chlore"@fr .
+:Sodium    a owl:Class ; rdfs:subClassOf :ElementChimique ; rdfs:label "sodium"@fr .
+:Calcium   a owl:Class ; rdfs:subClassOf :ElementChimique ; rdfs:label "calcium"@fr .
+:Carbone   a owl:Class ; rdfs:subClassOf :ElementChimique ; rdfs:label "carbone"@fr .
+:Oxygene   a owl:Class ; rdfs:subClassOf :ElementChimique ; rdfs:label "oxygene"@fr .
+:Aluminium a owl:Class ; rdfs:subClassOf :ElementChimique ; rdfs:label "aluminium"@fr .
+:Silicium  a owl:Class ; rdfs:subClassOf :ElementChimique ; rdfs:label "silicium"@fr .
+:Beryllium a owl:Class ; rdfs:subClassOf :ElementChimique ; rdfs:label "beryllium"@fr .
+
+###########################################################
+# TBOX - PROPRIETES
+###########################################################
+
+:aPourConstituant a owl:ObjectProperty, owl:AsymmetricProperty, owl:IrreflexiveProperty ;
+    rdfs:domain :Roche ;
+    rdfs:range [ a owl:Class ;
+                 owl:unionOf ( :Mineral :Mineraloide :MatiereOrganique ) ] ;
+    rdfs:label "a pour constituant"@fr ;
+    rdfs:comment "Relie une roche aux matieres qui la constituent."@fr .
+
+:aPourElement a owl:ObjectProperty ;
+    rdfs:subPropertyOf :contientElement ;
+    rdfs:domain [ a owl:Class ;
+                  owl:unionOf ( :Mineral :Mineraloide ) ] ;
+    rdfs:range :ElementChimique ;
+    rdfs:label "a pour element"@fr ;
+    rdfs:comment "Relie un mineral ou un mineraloide aux elements chimiques qui le composent."@fr .
+
+:contientElement a owl:ObjectProperty ;
+    rdfs:domain [ a owl:Class ;
+                  owl:unionOf ( :Roche :Mineral :Mineraloide ) ] ;
+    rdfs:range :ElementChimique ;
+    rdfs:label "contient l'element"@fr ;
+    rdfs:comment "Element chimique present dans une roche (via ses constituants) ou dans un mineral/mineraloide (directement). Propriete inferee."@fr ;
+    owl:propertyChainAxiom ( :aPourConstituant :aPourElement ) .
+
+:estTrouve a owl:ObjectProperty ;
+    rdfs:domain [ a owl:Class ; owl:unionOf ( :PierreNaturelle :Fossile ) ] ;
+    rdfs:range :Pays ;
+    rdfs:label "est trouve"@fr ;
+    rdfs:comment "S'applique a un specimen, pas a une espece."@fr .
+
+:estOriginaireDe a owl:ObjectProperty ;
+    rdfs:subPropertyOf :estTrouve ;
+    owl:propertyDisjointWith :estImportePar ;
+    rdfs:label "est originaire de"@fr .
+
+:estImportePar a owl:ObjectProperty ;
+    rdfs:domain :PierreNaturelle ;
+    rdfs:range :Pays ;
+    rdfs:label "est importe (par le pays)"@fr .
+
+:importe a owl:ObjectProperty ;
+    owl:inverseOf :estImportePar ;
+    rdfs:label "importe"@fr .
+
+:estExportePar a owl:ObjectProperty ;
+    rdfs:domain :PierreNaturelle ;
+    rdfs:range :Pays ;
+    rdfs:label "est exporte (par le pays)"@fr .
+
+:exporte a owl:ObjectProperty ;
+    owl:inverseOf :estExportePar ;
+    rdfs:label "exporte"@fr .
+
+:estPreserveDans a owl:ObjectProperty ;
+    rdfs:domain :Fossile ;
+    rdfs:range :Roche ;
+    rdfs:label "est preserve dans"@fr ;
+    rdfs:comment "Relie un fossile a la roche qui le contient."@fr .
+
+# --- proprietes de donnees ---
+:codeISO a owl:DatatypeProperty, owl:FunctionalProperty ;
+    rdfs:domain :Pays ;
+    rdfs:range xsd:string ;
+    rdfs:label "code ISO"@fr .
+
+:dureteMohs a owl:DatatypeProperty, owl:FunctionalProperty ;
+    rdfs:domain [ a owl:Class ; owl:unionOf ( :Mineral :Mineraloide ) ] ;
+    rdfs:range xsd:decimal ;
+    rdfs:label "durete (echelle de Mohs)"@fr ;
+    rdfs:comment "Durete d'un specimen sur l'echelle de Mohs (1 a 10)."@fr .
+
+:masseCarats a owl:DatatypeProperty, owl:FunctionalProperty ;
+    rdfs:domain :Gemme ;
+    rdfs:range xsd:decimal ;
+    rdfs:label "masse (carats)"@fr ;
+    rdfs:comment "Masse d'une gemme en carats (1 carat = 0,2 g)."@fr .
+
+###########################################################
+# TBOX - ESPECES MINERALES
+###########################################################
+
+# --- Mineraux de base ---
+:Corindon a owl:Class ;
+    rdfs:subClassOf :Mineral ,
+        [ a owl:Restriction ; owl:onProperty :aPourElement ; owl:someValuesFrom :Aluminium ] ,
+        [ a owl:Restriction ; owl:onProperty :aPourElement ; owl:someValuesFrom :Oxygene ] ;
+    rdfs:label "corindon"@fr .
+
+:Quartz a owl:Class ;
+    rdfs:subClassOf :Mineral ,
+        [ a owl:Restriction ; owl:onProperty :aPourElement ; owl:someValuesFrom :Silicium ] ,
+        [ a owl:Restriction ; owl:onProperty :aPourElement ; owl:someValuesFrom :Oxygene ] ;
+    rdfs:label "quartz"@fr .
+
+:Graphite a owl:Class ;
+    rdfs:subClassOf :Mineral ,
+        [ a owl:Restriction ; owl:onProperty :aPourElement ; owl:someValuesFrom :Carbone ] ,
+        [ a owl:Restriction ; owl:onProperty :aPourElement ;
+          owl:qualifiedCardinality "1"^^xsd:nonNegativeInteger ;
+          owl:onClass :ElementChimique ] ;
+    rdfs:label "graphite"@fr .
+
+:Halite a owl:Class ;
+    rdfs:subClassOf :Mineral ,
+        [ a owl:Restriction ; owl:onProperty :aPourElement ; owl:someValuesFrom :Sodium ] ,
+        [ a owl:Restriction ; owl:onProperty :aPourElement ; owl:someValuesFrom :Chlore ] ;
+    rdfs:label "halite"@fr .
+
+:Calcite a owl:Class ;
+    rdfs:subClassOf :Mineral ,
+        [ a owl:Restriction ; owl:onProperty :aPourElement ; owl:someValuesFrom :Calcium ] ,
+        [ a owl:Restriction ; owl:onProperty :aPourElement ; owl:someValuesFrom :Carbone ] ,
+        [ a owl:Restriction ; owl:onProperty :aPourElement ; owl:someValuesFrom :Oxygene ] ;
+    rdfs:label "calcite"@fr .
+
+:Hematite a owl:Class ;
+    rdfs:subClassOf :Mineral ,
+        [ a owl:Restriction ; owl:onProperty :aPourElement ; owl:someValuesFrom :Fer ] ,
+        [ a owl:Restriction ; owl:onProperty :aPourElement ; owl:someValuesFrom :Oxygene ] ;
+    rdfs:label "hematite"@fr .
+
+:Beryl a owl:Class ;
+    rdfs:subClassOf :Mineral ,
+        [ a owl:Restriction ; owl:onProperty :aPourElement ; owl:someValuesFrom :Beryllium ] ,
+        [ a owl:Restriction ; owl:onProperty :aPourElement ; owl:someValuesFrom :Aluminium ] ,
+        [ a owl:Restriction ; owl:onProperty :aPourElement ; owl:someValuesFrom :Silicium ] ,
+        [ a owl:Restriction ; owl:onProperty :aPourElement ; owl:someValuesFrom :Oxygene ] ;
+    rdfs:label "beryl"@fr .
+
+# --- Mineraloide ---
+:VerreVolcanique a owl:Class ;
+    rdfs:subClassOf :Mineraloide ,
+        [ a owl:Restriction ; owl:onProperty :aPourElement ; owl:someValuesFrom :Silicium ] ,
+        [ a owl:Restriction ; owl:onProperty :aPourElement ; owl:someValuesFrom :Oxygene ] ;
+    rdfs:label "verre volcanique"@fr ;
+    rdfs:comment "Matiere amorphe issue du refroidissement rapide d'une lave."@fr .
+
+# --- Pierres precieuses ---
+:Diamant a owl:Class ;
+    rdfs:subClassOf :PierrePrecieuse , :Mineral ,
+        [ a owl:Restriction ; owl:onProperty :aPourElement ; owl:someValuesFrom :Carbone ] ,
+        [ a owl:Restriction ; owl:onProperty :aPourElement ;
+          owl:qualifiedCardinality "1"^^xsd:nonNegativeInteger ;
+          owl:onClass :ElementChimique ] ;
+    rdfs:label "diamant"@fr .
+
+[] a owl:AllDisjointClasses ;
+    owl:members ( :Corindon :Quartz :Graphite :Halite :Calcite :Hematite :Beryl :Diamant ) .
+
+:Rubis a owl:Class ;
+    rdfs:subClassOf :PierrePrecieuse , :Corindon ;
+    rdfs:label "rubis"@fr ;
+    owl:disjointWith :Saphir .
+
+:Saphir a owl:Class ;
+    rdfs:subClassOf :PierrePrecieuse , :Corindon ;
+    rdfs:label "saphir"@fr .
+
+:Emeraude a owl:Class ;
+    rdfs:subClassOf :PierrePrecieuse , :Beryl ;
+    rdfs:label "emeraude"@fr ;
+    rdfs:comment "Variete verte du beryl, coloree par des traces de chrome et de vanadium."@fr .
+
+# --- Pierres fines ---
+:Amethyste a owl:Class ;
+    rdfs:subClassOf :PierreFine , :Quartz ;
+    rdfs:label "amethyste"@fr .
+
+:Opale a owl:Class ;
+    rdfs:subClassOf :PierreFine , :Mineraloide ,
+        [ a owl:Restriction ; owl:onProperty :aPourElement ; owl:someValuesFrom :Silicium ] ,
+        [ a owl:Restriction ; owl:onProperty :aPourElement ; owl:someValuesFrom :Oxygene ] ,
+        [ a owl:Restriction ; owl:onProperty :aPourElement ; owl:someValuesFrom :Hydrogene ] ;
+    rdfs:label "opale"@fr ;
+    rdfs:comment "Silice hydratee amorphe, donc mineraloide et non mineral."@fr .
+
+# --- Roches ---
+:SelGemme a owl:Class ;
+    rdfs:subClassOf :Roche ,
+        [ a owl:Restriction ; owl:onProperty :aPourConstituant ; owl:someValuesFrom :Halite ] ;
+    rdfs:label "sel gemme"@fr ;
+    rdfs:comment "Roche evaporitique composee de halite, extraite de gisements souterrains. Distincte du sel marin et du sel de table."@fr .
+
+:Marbre a owl:Class ;
+    rdfs:subClassOf :Roche ,
+        [ a owl:Restriction ; owl:onProperty :aPourConstituant ; owl:someValuesFrom :Calcite ] ;
+    rdfs:label "marbre"@fr .
+
+:Obsidienne a owl:Class ;
+    rdfs:subClassOf :Roche ,
+        [ a owl:Restriction ; owl:onProperty :aPourConstituant ; owl:someValuesFrom :VerreVolcanique ] ;
+    rdfs:label "obsidienne"@fr .
+
+:Houille a owl:Class ;
+    rdfs:subClassOf :Roche ,
+        [ a owl:Restriction ; owl:onProperty :aPourConstituant ; owl:someValuesFrom :MatiereOrganique ] ;
+    rdfs:label "houille"@fr .
+
+:Calcaire a owl:Class ;
+    rdfs:subClassOf :Roche ,
+        [ a owl:Restriction ; owl:onProperty :aPourConstituant ; owl:someValuesFrom :Calcite ] ;
+    rdfs:label "calcaire"@fr .
+
+:GeodeAmethyste a owl:Class ;
+    rdfs:subClassOf :Geode ,
+        [ a owl:Restriction ; owl:onProperty :aPourConstituant ; owl:someValuesFrom :Amethyste ] ;
+    rdfs:label "geode d'amethyste"@fr .
+
+###########################################################
+# ABOX - INDIVIDUS
+###########################################################
+
+# --- Pays ---
+:Myanmar   a :Pays ; rdfs:label "Myanmar"@fr   ; :codeISO "MMR" .
+:Botswana  a :Pays ; rdfs:label "Botswana"@fr  ; :codeISO "BWA" .
+:Bresil    a :Pays ; rdfs:label "Bresil"@fr    ; :codeISO "BRA" .
+:Australie a :Pays ; rdfs:label "Australie"@fr ; :codeISO "AUS" .
+:Inde      a :Pays ; rdfs:label "Inde"@fr      ; :codeISO "IND" .
+:Colombie  a :Pays ; rdfs:label "Colombie"@fr  ; :codeISO "COL" .
+
+[] a owl:AllDifferent ;
+    owl:distinctMembers ( :Myanmar :Botswana :Bresil :Australie :Inde :Colombie ) .
+
+# --- Pierres precieuses ---
+:Diamant_01 a :Diamant ;
+    rdfs:label "diamant n°1"@fr ;
+    :dureteMohs 10.0 ;
+    :masseCarats 1.2 ;
+    :estOriginaireDe :Botswana ;
+    :estExportePar :Botswana ;
+    :estImportePar :Inde .
+
+:Diamant_02 a :Diamant ;
+    rdfs:label "diamant n°2"@fr ;
+    :dureteMohs 10.0 ;
+    :masseCarats 0.8 ;
+    :estOriginaireDe :Australie ;
+    :estExportePar :Australie ;
+    :estImportePar :Inde .
+
+:Rubis_01 a :Rubis ;
+    rdfs:label "rubis n°1"@fr ;
+    :dureteMohs 9.0 ;
+    :masseCarats 2.5 ;
+    :estOriginaireDe :Myanmar .
+
+:Rubis_02 a :Rubis ;
+    rdfs:label "rubis n°2"@fr ;
+    :dureteMohs 9.0 ;
+    :masseCarats 1.8 ;
+    :estOriginaireDe :Myanmar ;
+    :estExportePar :Myanmar ;
+    :estImportePar :Inde .
+
+:Saphir_01 a :Saphir ;
+    rdfs:label "saphir n°1"@fr ;
+    :dureteMohs 9.0 ;
+    :masseCarats 3.0 ;
+    :estOriginaireDe :Myanmar .
+
+:Saphir_02 a :Saphir ;
+    rdfs:label "saphir n°2"@fr ;
+    :dureteMohs 9.0 ;
+    :masseCarats 2.2 ;
+    :estOriginaireDe :Inde .
+
+:Emeraude_01 a :Emeraude ;
+    rdfs:label "emeraude n°1"@fr ;
+    :dureteMohs 7.5 ;
+    :masseCarats 1.5 ;
+    :estOriginaireDe :Colombie .
+
+:Emeraude_02 a :Emeraude ;
+    rdfs:label "emeraude n°2"@fr ;
+    :dureteMohs 7.5 ;
+    :masseCarats 2.0 ;
+    :estOriginaireDe :Bresil .
+
+# --- Pierres fines ---
+:Amethyste_01 a :Amethyste ;
+    rdfs:label "amethyste n°1"@fr ;
+    :dureteMohs 7.0 ;
+    :masseCarats 5.0 ;
+    :estOriginaireDe :Bresil .
+
+:Amethyste_02 a :Amethyste ;
+    rdfs:label "amethyste n°2"@fr ;
+    :dureteMohs 7.0 ;
+    :masseCarats 8.0 ;
+    :estOriginaireDe :Bresil .
+
+:Opale_01 a :Opale ;
+    rdfs:label "opale n°1"@fr ;
+    :dureteMohs 5.5 ;
+    :masseCarats 3.0 ;
+    :estOriginaireDe :Australie .
+
+:Opale_02 a :Opale ;
+    rdfs:label "opale n°2"@fr ;
+    :dureteMohs 6.0 ;
+    :masseCarats 4.5 ;
+    :estOriginaireDe :Australie .
+
+# --- Mineraux simples ---
+:Graphite_01 a :Graphite ;
+    rdfs:label "graphite n°1"@fr ;
+    :dureteMohs 1.0 ;
+    :estOriginaireDe :Bresil .
+
+:Graphite_02 a :Graphite ;
+    rdfs:label "graphite n°2"@fr ;
+    :dureteMohs 1.5 ;
+    :estOriginaireDe :Inde .
+
+:Halite_01 a :Halite ;
+    rdfs:label "cristal de halite n°1"@fr ;
+    :dureteMohs 2.5 .
+
+:Halite_02 a :Halite ;
+    rdfs:label "cristal de halite n°2"@fr ;
+    :dureteMohs 2.5 .
+
+:Calcite_01 a :Calcite ; rdfs:label "cristal de calcite n°1"@fr ; :dureteMohs 3.0 .
+:Calcite_02 a :Calcite ; rdfs:label "cristal de calcite n°2"@fr ; :dureteMohs 3.0 .
+:Calcite_03 a :Calcite ; rdfs:label "cristal de calcite n°3"@fr ; :dureteMohs 3.0 .
+:Calcite_04 a :Calcite ; rdfs:label "cristal de calcite n°4"@fr ; :dureteMohs 3.0 .
+
+:Hematite_01 a :Hematite ;
+    rdfs:label "hematite n°1"@fr ;
+    :dureteMohs 6.0 ;
+    :estOriginaireDe :Bresil .
+
+:Hematite_02 a :Hematite ;
+    rdfs:label "hematite n°2"@fr ;
+    :dureteMohs 6.0 ;
+    :estOriginaireDe :Australie .
+
+# --- Mineraloide et matiere organique ---
+:VerreVolcanique_01 a :VerreVolcanique ; rdfs:label "verre volcanique n°1"@fr ; :dureteMohs 5.5 .
+:VerreVolcanique_02 a :VerreVolcanique ; rdfs:label "verre volcanique n°2"@fr ; :dureteMohs 5.5 .
+
+:MatiereOrganique_01 a :MatiereOrganique ; rdfs:label "matiere organique n°1"@fr .
+:MatiereOrganique_02 a :MatiereOrganique ; rdfs:label "matiere organique n°2"@fr .
+
+# --- Roches (leurs constituants alimentent la chaine contientElement) ---
+:SelGemme_01 a :SelGemme ;
+    rdfs:label "gisement de sel gemme n°1"@fr ;
+    :aPourConstituant :Halite_01 .
+
+:SelGemme_02 a :SelGemme ;
+    rdfs:label "gisement de sel gemme n°2"@fr ;
+    :aPourConstituant :Halite_02 .
+
+:Marbre_01 a :Marbre ;
+    rdfs:label "marbre n°1"@fr ;
+    :aPourConstituant :Calcite_01 .
+
+:Marbre_02 a :Marbre ;
+    rdfs:label "marbre n°2"@fr ;
+    :aPourConstituant :Calcite_02 .
+
+:Calcaire_01 a :Calcaire ;
+    rdfs:label "calcaire n°1"@fr ;
+    :aPourConstituant :Calcite_03 .
+
+:Calcaire_02 a :Calcaire ;
+    rdfs:label "calcaire n°2"@fr ;
+    :aPourConstituant :Calcite_04 .
+
+:Obsidienne_01 a :Obsidienne ;
+    rdfs:label "obsidienne n°1"@fr ;
+    :aPourConstituant :VerreVolcanique_01 .
+
+:Obsidienne_02 a :Obsidienne ;
+    rdfs:label "obsidienne n°2"@fr ;
+    :aPourConstituant :VerreVolcanique_02 .
+
+:Houille_01 a :Houille ;
+    rdfs:label "houille n°1"@fr ;
+    :aPourConstituant :MatiereOrganique_01 .
+
+:Houille_02 a :Houille ;
+    rdfs:label "houille n°2"@fr ;
+    :aPourConstituant :MatiereOrganique_02 .
+
+:GeodeAmethyste_01 a :GeodeAmethyste ;
+    rdfs:label "geode d'amethyste n°1"@fr ;
+    :estTrouve :Bresil ;
+    :aPourConstituant :Amethyste_01 .
+
+:GeodeAmethyste_02 a :GeodeAmethyste ;
+    rdfs:label "geode d'amethyste n°2"@fr ;
+    :estTrouve :Bresil ;
+    :aPourConstituant :Amethyste_02 .
+
+# --- Fossiles ---
+:Ammonite_01 a :Fossile ;
+    rdfs:label "ammonite n°1"@fr ;
+    :estTrouve :Bresil ;
+    :estPreserveDans :Calcaire_01 .
+
+:Trilobite_01 a :Fossile ;
+    rdfs:label "trilobite n°1"@fr ;
+    :estTrouve :Bresil ;
+    :estPreserveDans :Calcaire_02 .
+
+# --- Elements chimiques (individus) ---
+:Hydrogene_01 a :Hydrogene ; rdfs:label "hydrogene (element)"@fr .
+:Fer_01       a :Fer       ; rdfs:label "fer (element)"@fr .
+:Chlore_01    a :Chlore    ; rdfs:label "chlore (element)"@fr .
+:Sodium_01    a :Sodium    ; rdfs:label "sodium (element)"@fr .
+:Calcium_01   a :Calcium   ; rdfs:label "calcium (element)"@fr .
+:Carbone_01   a :Carbone   ; rdfs:label "carbone (element)"@fr .
+:Oxygene_01   a :Oxygene   ; rdfs:label "oxygene (element)"@fr .
+:Aluminium_01 a :Aluminium ; rdfs:label "aluminium (element)"@fr .
+:Silicium_01  a :Silicium  ; rdfs:label "silicium (element)"@fr .
+:Beryllium_01 a :Beryllium ; rdfs:label "beryllium (element)"@fr .
+
+[] a owl:AllDifferent ;
+    owl:distinctMembers ( :Hydrogene_01 :Fer_01 :Chlore_01 :Sodium_01 :Calcium_01
+                          :Carbone_01 :Oxygene_01 :Aluminium_01 :Silicium_01 :Beryllium_01 ) .
+
+# --- Composition des specimens (aPourElement) ---
+# Diamant et graphite : un seul element (cardinalite 1)
+:Diamant_01  :aPourElement :Carbone_01 .
+:Diamant_02  :aPourElement :Carbone_01 .
+:Graphite_01 :aPourElement :Carbone_01 .
+:Graphite_02 :aPourElement :Carbone_01 .
+
+# Corindon (rubis, saphir) : Al + O
+:Rubis_01  :aPourElement :Aluminium_01 , :Oxygene_01 .
+:Rubis_02  :aPourElement :Aluminium_01 , :Oxygene_01 .
+:Saphir_01 :aPourElement :Aluminium_01 , :Oxygene_01 .
+:Saphir_02 :aPourElement :Aluminium_01 , :Oxygene_01 .
+
+# Beryl (emeraude) : Be + Al + Si + O
+:Emeraude_01 :aPourElement :Beryllium_01 , :Aluminium_01 , :Silicium_01 , :Oxygene_01 .
+:Emeraude_02 :aPourElement :Beryllium_01 , :Aluminium_01 , :Silicium_01 , :Oxygene_01 .
+
+# Quartz (amethyste) : Si + O
+:Amethyste_01 :aPourElement :Silicium_01 , :Oxygene_01 .
+:Amethyste_02 :aPourElement :Silicium_01 , :Oxygene_01 .
+
+# Opale (mineraloide) : Si + O + H
+:Opale_01 :aPourElement :Silicium_01 , :Oxygene_01 , :Hydrogene_01 .
+:Opale_02 :aPourElement :Silicium_01 , :Oxygene_01 , :Hydrogene_01 .
+
+# Halite : Na + Cl
+:Halite_01 :aPourElement :Sodium_01 , :Chlore_01 .
+:Halite_02 :aPourElement :Sodium_01 , :Chlore_01 .
+
+# Calcite : Ca + C + O
+:Calcite_01 :aPourElement :Calcium_01 , :Carbone_01 , :Oxygene_01 .
+:Calcite_02 :aPourElement :Calcium_01 , :Carbone_01 , :Oxygene_01 .
+:Calcite_03 :aPourElement :Calcium_01 , :Carbone_01 , :Oxygene_01 .
+:Calcite_04 :aPourElement :Calcium_01 , :Carbone_01 , :Oxygene_01 .
+
+# Hematite : Fe + O
+:Hematite_01 :aPourElement :Fer_01 , :Oxygene_01 .
+:Hematite_02 :aPourElement :Fer_01 , :Oxygene_01 .
+
+# Verre volcanique (mineraloide) : Si + O
+:VerreVolcanique_01 :aPourElement :Silicium_01 , :Oxygene_01 .
+:VerreVolcanique_02 :aPourElement :Silicium_01 , :Oxygene_01 .
