@@ -1,0 +1,44 @@
+@prefix :     <http://example.org/gemmes#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd:  <http://www.w3.org/2001/XMLSchema#> .
+
+# Donnees de test, à tester avec pierres_precieuses_step4.ttl
+
+# Shape 1
+:Chine a :Pays ; rdfs:label "Chine"@fr .
+:Japon a :Pays ; :codeISO "jpn" .
+:Perou a :Pays ; :codeISO 604 .
+
+# Shape 2
+:Rubis_X a :Rubis ;
+    :dureteMohs 11.0 ;
+    :masseCarats -1.0 ;
+    :estOriginaireDe :Myanmar .
+
+:Saphir_X a :Saphir ;
+    :dureteMohs 9.0 ;
+    :estOriginaireDe :Inde .
+
+# Shape 3
+:Granite_X a :Roche .
+:Marbre_X a :Marbre ;
+    :aPourConstituant :Bresil .
+
+# Shape 4
+:Emeraude_X a :Emeraude , :PierreFine ;
+    :dureteMohs 7.5 ;
+    :masseCarats 1.0 ;
+    :estOriginaireDe :Colombie .
+
+# Shape 5
+:Diamant_X a :Diamant ;
+    :dureteMohs 10.0 ;
+    :masseCarats 0.5 ;
+    :estOriginaireDe :Inde ;
+    :estImportePar :Inde ;
+    :estExportePar :Diamant_01 .
+
+# Shape WARN origine
+:Saphir_Y a :Saphir ;
+    :dureteMohs 9.0 ;
+    :masseCarats 1.0 .

@@ -1,0 +1,115 @@
+@prefix :     <http://example.org/gemmes#> .
+@prefix shp:  <http://example.org/gemmes/shapes#> .
+@prefix sh:   <http://www.w3.org/ns/shacl#> .
+@prefix owl:  <http://www.w3.org/2002/07/owl#> .
+@prefix rdf:  <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd:  <http://www.w3.org/2001/XMLSchema#> .
+
+<http://example.org/gemmes/shapes> a owl:Ontology ;
+    rdfs:label "Shapes SHACL - ontologie des pierres precieuses"@fr .
+
+###########################################################
+# SHAPE 1 - NodeShape + PropertyShape autonome
+###########################################################
+
+shp:CodeISOShape a sh:PropertyShape ;
+    sh:path :codeISO ;
+    sh:name "code ISO"@fr ;
+    sh:datatype xsd:string ;
+    sh:minCount 1 ;
+    sh:maxCount 1 ;
+    sh:pattern "^[A-Z]{3}$" ;
+    sh:message "Un pays doit avoir exactement un code ISO : une chaine de 3 majuscules (ex. BRA)."@fr .
+
+shp:PaysShape a sh:NodeShape ;
+    sh:targetClass :Pays ;
+    sh:nodeKind sh:IRI ;
+    sh:property shp:CodeISOShape .
+
+###########################################################
+# SHAPE 2 - NodeShape avec deux PropertyShapes anonymes
+###########################################################
+
+shp:GemmeShape a sh:NodeShape ;
+    sh:targetClass :Gemme ;
+    sh:property [
+        sh:path :masseCarats ;
+        sh:datatype xsd:decimal ;
+        sh:minCount 1 ;
+        sh:maxCount 1 ;
+        sh:minExclusive 0 ;
+        sh:message "Une gemme doit avoir une masse en carats strictement positive."@fr
+    ] ;
+    sh:property [
+        sh:path :dureteMohs ;
+        sh:datatype xsd:decimal ;
+        sh:minCount 1 ;
+        sh:minInclusive 1 ;
+        sh:maxInclusive 10 ;
+        sh:message "La durete de Mohs d'une gemme est obligatoire et comprise entre 1 et 10."@fr
+    ] .
+
+###########################################################
+# SHAPE 3 - sh:or
+###########################################################
+
+shp:RocheShape a sh:NodeShape ;
+    sh:targetClass :Roche ;
+    sh:property [
+        sh:path :aPourConstituant ;
+        sh:minCount 1 ;
+        sh:or (
+            [ sh:class :Mineral ]
+            [ sh:class :Mineraloide ]
+            [ sh:class :MatiereOrganique ]
+        ) ;
+        sh:message "Une roche doit avoir au moins un constituant, de type mineral, mineraloide ou matiere organique."@fr
+    ] .
+
+###########################################################
+# SHAPE 4 - sh:and + sh:not
+###########################################################
+
+shp:PierrePrecieuseShape a sh:NodeShape ;
+    sh:targetClass :PierrePrecieuse ;
+    sh:and (
+        [ sh:class :Gemme ]
+        [ sh:not [ sh:class :PierreNonPrecieuse ] ]
+    ) ;
+    sh:message "Une pierre precieuse doit etre une gemme et ne peut pas etre classee comme pierre non precieuse."@fr .
+
+###########################################################
+# SHAPE 5 - Contraintes disjoint sur l'import / export (sh:disjoint)
+###########################################################
+
+shp:CommerceShape a sh:NodeShape ;
+    sh:targetClass :PierreNaturelle ;
+    sh:property [
+        sh:path :estOriginaireDe ;
+        sh:disjoint :estImportePar ;
+        sh:message "Le pays d'origine d'une pierre ne peut pas etre aussi son pays importateur."@fr
+    ] ;
+    sh:property [
+        sh:path :estExportePar ;
+        sh:nodeKind sh:IRI ;
+        sh:class :Pays ;
+        sh:message "Le pays exportateur doit etre une instance de :Pays."@fr
+    ] ;
+    sh:property [
+        sh:path :estImportePar ;
+        sh:nodeKind sh:IRI ;
+        sh:class :Pays ;
+        sh:message "Le pays importateur doit etre une instance de :Pays."@fr
+    ] .
+
+###########################################################
+# SHAPE WARN - Warning sur une origine manquante
+###########################################################
+
+shp:OrigineShape a sh:PropertyShape ;
+    sh:path :estOriginaireDe ;
+    sh:minCount 1 ;
+    sh:class :Pays ;
+    sh:severity sh:Warning ;
+    sh:message "Recommandation : une pierre precieuse devrait avoir un pays d'origine documente."@fr .
