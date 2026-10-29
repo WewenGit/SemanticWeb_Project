@@ -603,22 +603,61 @@
 # ABOX DE TEST
 ###########################################################
 
-# Mineral de carbone, durete 10 : doit etre identifie comme diamant (R1)
+# R1
 :Specimen_01 a :Mineral ;
     rdfs:label "specimen non identifie n°1"@fr ;
     :dureteMohs 10.0 ;
     :aPourElement :Carbone_01 .
 
-# Temoin negatif : carbone mais durete 1.5 -> R1 ne doit PAS s'appliquer
+# R1 non applicable
 :Specimen_02 a :Mineral ;
     rdfs:label "specimen non identifie n°2"@fr ;
     :dureteMohs 1.5 ;
     :aPourElement :Carbone_01 .
 
-# Temoin monde ouvert : durete 10 mais composition inconnue -> R1 ne s'applique pas
-:Specimen_03 a :Mineral ;
-    rdfs:label "specimen non identifie n°3"@fr ;
-    :dureteMohs 10.0 .
+# R2
+:Gemme_Corindon_01 a :Gemme ;
+    rdfs:label "corindon test"@fr ;
+    :dureteMohs 9.0 .
+
+# R2 non applicable
+:Gemme_Quartz_01 a :Gemme ;
+    rdfs:label "quartz test"@fr ;
+    :dureteMohs 7.0 .
+
+# R3
+:Precieuse_Gros_01 a :PierrePrecieuse ;
+    rdfs:label "pierre precieuse 2 carats"@fr ;
+    :masseCarats 2.0 .
+
+# R3 non applicable
+:Precieuse_Petite_01 a :PierrePrecieuse ;
+    rdfs:label "pierre precieuse 1.2 carat"@fr ;
+    :masseCarats 1.2 .
+
+# R6 + R7
+:Bresil a :Pays .
+:Inde a :Pays .
+:France a :Pays .
+
+:Emeraude_Naturelle_01 a :PierreNaturelle ;
+    rdfs:label "emeraude naturelle test"@fr ;
+    :estExporteParLePays :Bresil ;
+    :estImporteParLePays :Inde .
+
+# R6 non applicable
+:Saphir_Naturel_01 a :PierreNaturelle ;
+    rdfs:label "saphir naturel test"@fr ;
+    :estExporteParLePays :France .
+
+# R8
+:Roche_Calcaire_01 a :Roche ;
+    rdfs:label "roche avec carbone"@fr ;
+    :contientElement :Carbone_01 .
+
+# R8 non applicable
+:Roche_Basalte_01 a :Roche ;
+    rdfs:label "roche sans carbone"@fr .
 
 ###########################################################
 # REGLES SWRL
