@@ -1729,11 +1729,6 @@ gemmes:Fer_01 rdf:type owl:NamedIndividual ,
               rdfs:label "fer (element)"@fr .
 
 
-###  http://example.org/gemmes#France
-gemmes:France rdf:type owl:NamedIndividual ,
-                       gemmes:Pays .
-
-
 ###  http://example.org/gemmes#Gemme_Corindon_01
 gemmes:Gemme_Corindon_01 rdf:type owl:NamedIndividual ,
                                   gemmes:Gemme ,
@@ -1750,6 +1745,7 @@ gemmes:Gemme_Corindon_01 rdf:type owl:NamedIndividual ,
                                                 )
                                   ] ;
                          gemmes:dureteMohs 9.0 ;
+                         gemmes:masseCarats 1.5 ;
                          rdfs:label "corindon test"@fr .
 
 
@@ -1768,6 +1764,7 @@ gemmes:Gemme_Quartz_01 rdf:type owl:NamedIndividual ,
                                               )
                                 ] ;
                        gemmes:dureteMohs 7.0 ;
+                       gemmes:masseCarats 2.0 ;
                        rdfs:label "quartz test"@fr .
 
 
@@ -2411,6 +2408,7 @@ gemmes:Precieuse_Gros_01 rdf:type owl:NamedIndividual ,
                                                 )
                                   ] ;
                          gemmes:masseCarats 2.0 ;
+                         gemmes:dureteMohs 8.0 ;
                          rdfs:label "pierre precieuse 2 carats"@fr .
 
 
@@ -2425,6 +2423,7 @@ gemmes:Precieuse_Petite_01 rdf:type owl:NamedIndividual ,
                                                   )
                                     ] ;
                            gemmes:masseCarats 1.2 ;
+                           gemmes:dureteMohs 7.5 ;
                            rdfs:label "pierre precieuse 1.2 carat"@fr .
 
 
@@ -2443,6 +2442,7 @@ gemmes:Roche_Basalte_01 rdf:type owl:NamedIndividual ,
                                                  gemmes:Roche
                                                )
                                  ] ;
+                                 gemmes:aPourConstituant gemmes:Hematite_01;
                         rdfs:label "roche sans carbone"@fr .
 
 
@@ -2463,6 +2463,7 @@ gemmes:Roche_Calcaire_01 rdf:type owl:NamedIndividual ,
                                                 )
                                   ] ;
                          gemmes:contientElement gemmes:Carbone_01 ;
+                         gemmes:aPourConstituant gemmes:Calcite_03;
                          rdfs:label "roche avec carbone"@fr .
 
 
@@ -2679,7 +2680,6 @@ gemmes:Saphir_Naturel_01 rdf:type owl:NamedIndividual ,
                                                   gemmes:PierreNaturelle
                                                 )
                                   ] ;
-                         gemmes:estExporteParLePays gemmes:France ;
                          rdfs:label "saphir naturel test"@fr .
 
 
@@ -2787,6 +2787,7 @@ gemmes:Specimen_01 rdf:type owl:NamedIndividual ,
                    gemmes:aPourElement gemmes:Carbone_01 ;
                    gemmes:contientElement gemmes:Carbone_01 ;
                    gemmes:dureteMohs 10.0 ;
+                   gemmes:masseCarats 2.2 ;
                    rdfs:label "specimen non identifie n°1"@fr .
 
 

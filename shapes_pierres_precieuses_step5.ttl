@@ -72,6 +72,7 @@ shp:RocheShape a sh:NodeShape ;
 ###########################################################
 
 shp:PierrePrecieuseShape a sh:NodeShape ;
+    sh:property shp:OrigineShape ;
     sh:targetClass :PierrePrecieuse ;
     sh:and (
         [ sh:class :Gemme ]
