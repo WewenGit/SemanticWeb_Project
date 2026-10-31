@@ -136,7 +136,6 @@
 
 :estOriginaireDe a owl:ObjectProperty ;
     rdfs:subPropertyOf :estTrouve ;
-    owl:propertyDisjointWith :estImportePar ;
     rdfs:label "est originaire de"@fr .
 
 :estImportePar a owl:ObjectProperty ;
